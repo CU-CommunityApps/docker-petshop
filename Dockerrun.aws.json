@@ -1,0 +1,45 @@
+{
+  "AWSEBDockerrunVersion": "2",
+  "authentication": {
+    "bucket": "cu-cs-dockercfg",
+    "key": ".dockercfg"
+  },
+  "volumes": [
+    {
+      "name": "petshop-efs-mount",
+      "host": {
+        "sourcePath": "/mnt/efs/petshop"
+      }
+    }
+  ],
+  "containerDefinitions": [
+    {
+      "name": "petshop",
+      "image": "dtr.cucloud.net/cs/petshop-test:v_3",
+      "environment": [
+        {
+          "name": "EXAMPLE_KEY",
+          "Value": "example-value"
+        }
+      ],
+      "essential": true,
+      "memory": 384,
+      "mountPoints": [
+        {
+          "sourceVolume": "petshop-efs-mount",
+          "containerPath": "/var/petshop",
+          "readOnly": false
+        }
+      ],
+      "portMappings": [
+        {
+          "hostPort": 8080,
+          "containerPort": 8080
+        },{
+          "hostPort": 8443,
+          "containerPort": 8443
+        }
+      ]
+    }
+  ]
+}

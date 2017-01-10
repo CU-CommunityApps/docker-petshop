@@ -1,0 +1,19 @@
+{
+  "AWSEBDockerrunVersion": "1",
+  "Ports": [
+    {
+      "ContainerPort": "8080"
+    }
+  ],
+  "Authentication": {
+    "Bucket": "cu-cs-dockercfg",
+      "Key": ".dockercfg"
+  },
+  "Volumes": [
+    {
+      "HostDirectory": "/mnt/efs/petshop",
+      "ContainerDirectory": "/var/petshop"
+    }
+  ],
+  "Logging": "/var/log"
+}

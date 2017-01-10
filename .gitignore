@@ -1,0 +1,6 @@
+
+# Elastic Beanstalk Files
+keys/*
+version*
+build/*
+tmp/*

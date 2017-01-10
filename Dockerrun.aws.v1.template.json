@@ -1,0 +1,22 @@
+{
+  "AWSEBDockerrunVersion": "1",
+  "Image": {
+    "Name": "dtr.cucloud.net/cs/petshop-DOCKER_ENV:v_BUILD_NUMBER"
+  },
+  "Ports": [
+    {
+      "ContainerPort": "8080"
+    }
+  ],
+  "Authentication": {
+    "Bucket": "cu-cs-dockercfg",
+    "Key": ".dockercfg"
+  },
+  "Volumes": [
+    {
+      "HostDirectory": "/mnt/efs/petshop",
+      "ContainerDirectory": "/var/petshop"
+    }
+  ],
+  "Logging": "/var/log"
+}
