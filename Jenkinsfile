@@ -2,11 +2,11 @@
 node {
 
   echo "------------------------"
-  echo "PIPELINE_BUILD: ${env.BUILD_NUMBER}"
-  echo "DOCKER_ENV: ${DOCKER_ENV}"
-  echo "BEANSTALK_ENV: ${BEANSTALK_ENV}"
-  echo "FILESYSTEM: ${FILESYSTEM}"
-  echo "GIT_BRANCH: ${GIT_BRANCH}"
+  echo "BUILD_NUMBER: ${env.BUILD_NUMBER}"
+  // echo "DOCKER_ENV: ${DOCKER_ENV}"
+  // echo "BEANSTALK_ENV: ${BEANSTALK_ENV}"
+  // echo "FILESYSTEM: ${FILESYSTEM}"
+  // echo "GIT_BRANCH: ${GIT_BRANCH}"
   echo "------------------------"
 
   stage 'Test'
