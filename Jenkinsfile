@@ -3,6 +3,7 @@ node {
 
   echo "------------------------"
   echo "BUILD_NUMBER: ${env.BUILD_NUMBER}"
+  echo "WORKSPACE: ${env.WORKSPACE}"
   // echo "DOCKER_ENV: ${DOCKER_ENV}"
   // echo "BEANSTALK_ENV: ${BEANSTALK_ENV}"
   // echo "FILESYSTEM: ${FILESYSTEM}"
@@ -16,7 +17,7 @@ node {
 //  ]
 
   stage 'Build'
-  sh 'build-scripts/docker-build.sh'
+  sh '$WORKSPACE/build-scripts/docker-build.sh'
   // build job: 'petshop-docker-build', parameters: [ \
   //   string(name: 'DOCKER_ENV', value: DOCKER_ENV), \
   //   string(name: 'GIT_BRANCH', value: GIT_BRANCH), \
