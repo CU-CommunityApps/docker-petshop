@@ -10,17 +10,18 @@ node {
   echo "------------------------"
 
   stage 'Test'
-  build job: 'petshop-puppet-tests', parameters: [ \
-    string(name: 'PIPELINE_BUILD', value: env.BUILD_NUMBER), \
-    string(name: 'GIT_BRANCH', value: GIT_BRANCH) \
-  ]
+//  build job: 'petshop-puppet-tests', parameters: [ \
+//    string(name: 'PIPELINE_BUILD', value: env.BUILD_NUMBER), \
+//    string(name: 'GIT_BRANCH', value: GIT_BRANCH) \
+//  ]
 
   stage 'Build'
-  build job: 'petshop-docker-build', parameters: [ \
-    string(name: 'DOCKER_ENV', value: DOCKER_ENV), \
-    string(name: 'GIT_BRANCH', value: GIT_BRANCH), \
-    string(name: 'PIPELINE_BUILD', value: env.BUILD_NUMBER) \
-    ]
+  sh 'build-scripts/docker-build.sh'
+  // build job: 'petshop-docker-build', parameters: [ \
+  //   string(name: 'DOCKER_ENV', value: DOCKER_ENV), \
+  //   string(name: 'GIT_BRANCH', value: GIT_BRANCH), \
+  //   string(name: 'PIPELINE_BUILD', value: env.BUILD_NUMBER) \
+  //   ]
 }
 
 // Best practices:
@@ -35,12 +36,12 @@ if (DOCKER_ENV == 'prod') {
 
 node {
   stage 'Deploy'
-  build job: 'petshop-beanstalk-deploy', parameters: [ \
-    string(name: 'DOCKER_ENV', value: DOCKER_ENV), \
-    string(name: 'FILESYSTEM', value: FILESYSTEM), \
-    string(name: 'BEANSTALK_ENV', value: BEANSTALK_ENV), \
-    string(name: 'GIT_BRANCH', value: GIT_BRANCH), \
-    string(name: 'PIPELINE_BUILD', value: env.BUILD_NUMBER) \
-    ]
+  // build job: 'petshop-beanstalk-deploy', parameters: [ \
+  //   string(name: 'DOCKER_ENV', value: DOCKER_ENV), \
+  //   string(name: 'FILESYSTEM', value: FILESYSTEM), \
+  //   string(name: 'BEANSTALK_ENV', value: BEANSTALK_ENV), \
+  //   string(name: 'GIT_BRANCH', value: GIT_BRANCH), \
+  //   string(name: 'PIPELINE_BUILD', value: env.BUILD_NUMBER) \
+  //   ]
 
 }
