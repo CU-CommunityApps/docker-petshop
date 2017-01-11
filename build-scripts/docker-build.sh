@@ -8,11 +8,11 @@ echo BUILD_NUMBER: $BUILD_NUMBER
 echo DOCKER_ENV: $DOCKER_ENV
 
 
-if [ -n "$JENKINS_HOME" ]; then
+if [ -n "$GIT_DEPLOY_KEY_FILE" ]; then
   # Do Jenkins-specific actions
   rm -rf keys || echo "keys not present"
   mkdir keys || echo "keys already exist"
-  cp $JENKINS_HOME/keys/id_rsa* keys/
+  cp $GIT_DEPLOY_KEY_FILE keys/id_rsa
   #cp ${GIT_DEPLOY_KEY} keys/id_rsa
   #cp ${EYAML_PRIVATE_KEY} keys/
   #cp ${EYAML_PUBLIC_KEY} keys/
