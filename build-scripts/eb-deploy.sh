@@ -35,6 +35,7 @@ aws elasticbeanstalk create-application-version \
 while [ "$RESULT" != "PROCESSED" ]; do
   RESULT=`aws elasticbeanstalk describe-application-versions --application-name $APP_NAME --version-labels $VERSION_LABEL --region $AWS_REGION --query 'ApplicationVersions[0].Status' --output text`
   echo $RESULT
+  sleep 10
 done
 
 aws elasticbeanstalk update-environment \
