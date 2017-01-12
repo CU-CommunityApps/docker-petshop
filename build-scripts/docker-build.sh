@@ -29,7 +29,7 @@ docker build \
 docker push dtr.cucloud.net/cs/${APP_NAME}-${DOCKER_ENV}:latest
 docker tag dtr.cucloud.net/cs/${APP_NAME}-${DOCKER_ENV}:latest dtr.cucloud.net/cs/${APP_NAME}-${DOCKER_ENV}:v_${BUILD_NUMBER}
 docker push dtr.cucloud.net/cs/${APP_NAME}-${DOCKER_ENV}:v_${BUILD_NUMBER}
-docker rmi dtr.cucloud.net/cs/${APP_NAME}-${DOCKER_ENV}:v_${BUILD_NUMBER}
+# docker rmi dtr.cucloud.net/cs/${APP_NAME}-${DOCKER_ENV}:v_${BUILD_NUMBER}
 #docker images | grep petshop
 
 if [ -n "$GIT_DEPLOY_KEY_FILE" ]; then
