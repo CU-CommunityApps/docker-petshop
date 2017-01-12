@@ -15,31 +15,33 @@ echo APP_NAME: $APP_NAME
   # Do Jenkins-specific actions
 #fi
 
-DOCKER_IMAGE=dtr.cucloud.net/cs/${APP_NAME}-${DOCKER_ENV}:v_${BUILD_NUMBER}
-VERSION_LABEL=${APP_NAME}-${DOCKER_ENV}-${BUILD_NUMBER}
+DOCKER_IMAGE=dtr.cucloud.net/cs/$APP_NAME-$DOCKER_ENV:v_$BUILD_NUMBER
+VERSION_LABEL=$APP_NAME-$DOCKER_ENV-$BUILD_NUMBER
 ZIP_FILE=$VERSION_LABEL.zip
-S3_BUCKET=elasticbeanstalk-${AWS_REGION}-${AWS_ACCOUNT}
+S3_BUCKET=elasticbeanstalk-$AWS_REGION-$AWS_ACCOUNT
 
 docker run $DOCKER_IMAGE cat /tmp/$ZIP_FILE > $ZIP_FILE
 
-aws s3 cp $ZIP_FILE s3://$S3_BUCKET/${APP_NAME}/$ZIP_FILE
+aws s3 cp --region $AWS_REGION $ZIP_FILE s3://$S3_BUCKET/$APP_NAME/$ZIP_FILE
 
 echo "Create application version."
 aws elasticbeanstalk create-application-version \
-  --application-name ${APP_NAME} \
-  --version-label ${VERSION_LABEL} \
-  --source-bundle S3Bucket=$S3_BUCKET,S3Key=${APP_NAME}/$ZIP_FILE \
-  --process
+  --application-name $APP_NAME \
+  --version-label $VERSION_LABEL \
+  --source-bundle S3Bucket=$S3_BUCKET,S3Key=$APP_NAME/$ZIP_FILE \
+  --process \
+  --region $AWS_REGION
 
 while [ "$RESULT" != "PROCESSED" ]; do
-  RESULT=`aws elasticbeanstalk describe-application-versions --application-name ${APP_NAME} --version-labels ${VERSION_LABEL} --query 'ApplicationVersions[0].Status' --output text`
+  RESULT=`aws elasticbeanstalk describe-application-versions --application-name $APP_NAME --version-labels $VERSION_LABEL --region $AWS_REGION --query 'ApplicationVersions[0].Status' --output text`
   echo $RESULT
 done
 
 aws elasticbeanstalk update-environment \
-   --application-name ${APP_NAME} \
-   --environment-name ${APP_NAME}-${DOCKER_ENV} \
-   --version-label ${VERSION_LABEL}
+   --application-name $APP_NAME \
+   --environment-name $APP_NAME-$DOCKER_ENV \
+   --version-label $VERSION_LABEL \
+   --region $AWS_REGION
 
 # Clean up
 docker rmi $DOCKER_IMAGE
