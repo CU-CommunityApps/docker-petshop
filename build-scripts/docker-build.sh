@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Set value for varaibles, if they don't exist.
+# Set value for variables, if they don't exist.
 : ${DOCKER_ENV:=local}
 : ${BUILD_NUMBER:=1}
 : ${APP_NAME:=petshop}
