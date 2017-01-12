@@ -27,6 +27,6 @@ docker push dtr.cucloud.net/cs/petshop-${DOCKER_ENV}:v_${BUILD_NUMBER}
 docker rmi dtr.cucloud.net/cs/petshop-${DOCKER_ENV}:v_${BUILD_NUMBER}
 #docker images | grep petshop
 
-if [ -n "$JENKINS_HOME" ]; then
+if [ -n "$GIT_DEPLOY_KEY_FILE" ]; then
   rm -rf keys || echo "keys have been deleted"
 fi
