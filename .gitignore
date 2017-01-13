@@ -4,3 +4,4 @@ keys/*
 version*
 build/*
 tmp/*
+elasticbeanstalk/*
