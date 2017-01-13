@@ -14,12 +14,12 @@ if [ -n "$GIT_DEPLOY_KEY_FILE" ]; then
   rm -rf keys || echo "keys not present"
   mkdir keys || echo "keys already exist"
   cp $GIT_DEPLOY_KEY_FILE keys/id_rsa
-  #cp $GIT_DEPLOY_KEY keys/id_rsa
   #cp $EYAML_PRIVATE_KEY keys/
   #cp $EYAML_PUBLIC_KEY keys/
 fi
 
-echo $BUILD_NUMBER > version
+# Break the Docker build cache
+date > version
 
 DOCKER_IMAGE=dtr.cucloud.net/cs/$APP_NAME-$DOCKER_ENV
 
