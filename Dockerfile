@@ -1,4 +1,4 @@
-FROM dtr.cucloud.net/cs/base
+FROM dtr.cucloud.net/cs/awscli
 
 # build argument for environment
 ARG DOCKER_ENV=local
@@ -9,6 +9,9 @@ RUN \
   apt-get update && \
   apt-get install -y nginx zip && \
   echo "daemon off;" >> /etc/nginx/nginx.conf
+
+# Setup launch script
+COPY container-scripts/launch.sh /root
 
 # bust Docker caching
 ADD version /tmp/version
@@ -42,4 +45,4 @@ RUN \
 
 EXPOSE 8080
 
-CMD ["/usr/sbin/nginx", "-c", "/etc/nginx/nginx.conf"]
+CMD ["/root/launch.sh"]

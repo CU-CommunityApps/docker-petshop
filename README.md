@@ -1,4 +1,19 @@
 
+## Required AWS Resources
+
+- KMS key (e.g. cu-cs-sanbox/petshop-demo-key, 4c044060-5160-4738-9c7b-009e7fc2c104)
+
+
+
+## De/Encrypt files with KMS
+
+```
+aws kms encrypt --key-id 4c044060-5160-4738-9c7b-009e7fc2c104 --plaintext fileb://my-conf.dev.kms.conf --output text --query CiphertextBlob | base64 --decode > kms.encrypted.output
+
+aws kms decrypt --ciphertext-blob fileb://kms.encrypted.output --output text --query Plaintext | base64 --decode > kms.plaintext.output
+```
+
+See Bash scripts in puppet-petshop/fles/kms-secrets.
 
 ## Build/Run container locally
 
@@ -7,7 +22,8 @@ docker rm $(docker ps -a -q)
 
 docker build --build-arg DOCKER_ENV=test -t petshop .
 
-docker run --rm -p 8080:8080 -v ~/tmp/petshop:/var/petshop --name petshop petshop
+# provide awscli credentials
+docker run --rm -p 8080:8080 -v ~/.aws:/root/.aws --name petshop petshop
 
 docker exec -it petshop bash
 ```
