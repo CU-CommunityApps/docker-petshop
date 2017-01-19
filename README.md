@@ -20,13 +20,15 @@ This example shows two different methods for managing secrets:
 
 **Puppet/eyaml:** Using eyaml and Puppet to decrypt secrets during the docker build process. Encrypted secrets are stored in the puppet-petshop repo. The plaintext of secrets are embedded in Docker images, which are typically stored in dtr.cucloud.net. This method focuses on using treating individual atttributes/properties in yaml files as secrets.
 
-**KMS/custom:** Using custom scripting that uses the AWS Key Management Service (KMS) to decrypt secrets at container launch time. This method leaves secrets encrypted in Docker images stored in dtr.cucloud.net. This method focuses on treating entire files as secret.
+**KMS/custom:** Custom scripting that uses the AWS Key Management Service (KMS) to decrypt secrets at container launch time. This method leaves secrets encrypted in Docker images stored in dtr.cucloud.net. This method focuses on treating entire files as secret.
 
 ### Secrets using eyaml
 
+To be documented...
+
 ### Decrypting secrets at launch
 
-In this approach entire small files (up to 4KB) are treated as secrets and placed in the docker image in encrypted form. At container launch time, we use custom scripting to decrypt those files.
+With this approach, entire small files (up to 4KB) are treated as secrets and placed in the docker image in encrypted form. At container launch time, we use custom scripting to decrypt those files. The 4KB limit comes from the capabilities of KMS. For larger files, you would have to use KMS data keys and key wrapping to encrypt your secrets. See [AWS Key Management Service Concepts](http://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#data-keys).
 
 AWS resource configuration required for this approach:
 
