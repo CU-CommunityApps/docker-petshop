@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Build and store the docker image for the applicaiton.
+# This script is written to work both in Jenkins, and on a local workstation.
+
 # Set value for variables, if they don't exist.
 : ${DOCKER_ENV:=local}
 : ${BUILD_NUMBER:=1}
