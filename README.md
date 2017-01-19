@@ -49,8 +49,8 @@ Puppet resources required for this approach:
   - This directory contains example service configuration files and custom scripts.
   - The `kms-decrypt-files.sh` script makes KMS CLI calls to decrypt the list of files passed to it as parameters.
   - The `kms-encrypt-files.sh` script makes KMS CLI calls to encrypt the list of files passed to it as parameters. It contains a reference to the specific KMS key used by this application.
-  - Files with name format like `service.{environment}.conf`. These are example  environment-specific service configuration files that would contain plain text secrets. **In a real project, these files would NOT be stored in the repo. They would be transient only on a developer's workstation.**
-  - Files with name format like `service.{environment}.conf.encrypted`. These are encrypted versions of the `service.{environment}.conf` files. Normally, these would be the only versions of the service configuration files to be stored in the repo.
+  - Files with name format like `service.{environment}.conf`. These are example  environment-specific service configuration files that would contain plain text secrets. **In a real project, these files would NOT be stored in the repo. They would be transient on a developer's workstation.**
+  - Files with name format like `service.{environment}.conf.encrypted`. These are encrypted versions of the `service.{environment}.conf` files. Normally, these would be the only versions of the service configuration files to be stored in a git repo.
 
 #### How secrets are deployed in this scenario:
 
@@ -127,7 +127,7 @@ Secrets will normally be configured by a developer/sysadmin working with the pup
 
 1. Configure your Puppet manifest to deploy your encrypted file and the decryption script, contents as is, to the Docker image. Do that in `puppet-petshop/manifests/app.pp`.
 
-1. Setup a launch script (e.g., [launch.sh](container-scripts/launch.sh)) to decrypt the file and ensure it has the right linux group ownership and permissions.
+1. Setup a launch script (e.g., [launch.sh](container-scripts/launch.sh)) to decrypt the file and ensure it has the right linux group ownership and permissions in the container.
 
 1. Ensure that your [Dockerfile](Dockerfile) is configured to call your decryption script at container launch (instead of at Docker build time).
 
@@ -136,21 +136,13 @@ Secrets will normally be configured by a developer/sysadmin working with the pup
 - We could use different KMS keys for each environment (dev, test, prod, etc.). To accomplish this, we would have set the KMS key id as a property in puppet-petshop/hiera-data/[dev|local|prod|test].eyaml and use the Puppet templating capability to set the id of the KMS key in a template of a bash script.
 
 
-
-## Required AWS Resources
-
-- KMS key (e.g. cu-cs-sanbox/petshop-demo-key, 4c044060-5160-4738-9c7b-009e7fc2c104)
-
-
-## De/Encrypt files with KMS
+### AWS CLI commands to Decrypt and Encrypt files with KMS
 
 ```
-aws kms encrypt --key-id 4c044060-5160-4738-9c7b-009e7fc2c104 --plaintext fileb://my-conf.dev.kms.conf --output text --query CiphertextBlob | base64 --decode > kms.encrypted.output
+aws kms encrypt --key-id 4c044060-5160-4738-9c7b-009e7fc2c104 --plaintext fileb://service.dev.conf --output text --query CiphertextBlob | base64 --decode > service.dev.conf.encrypted
 
-aws kms decrypt --ciphertext-blob fileb://kms.encrypted.output --output text --query Plaintext | base64 --decode > kms.plaintext.output
+aws kms decrypt --ciphertext-blob fileb://service.dev.conf.encrypted --output text --query Plaintext | base64 --decode > service.dev.conf.plaintext
 ```
-
-See Bash scripts in puppet-petshop/fles/kms-secrets.
 
 ## Build/Run container locally
 
