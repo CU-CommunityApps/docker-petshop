@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Update an the existing EB environment by deploying the specified
+# Docker image to it.
+
 # Set value for variables, if they don't exist.
 : ${DOCKER_ENV:=local}
 : ${BUILD_NUMBER:=1}

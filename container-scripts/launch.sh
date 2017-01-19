@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# This script does final setup of the container, and launches the main process.
+# This script does final setup of the container
+# and launches the main container process.
 
 # Descrypt secrets. The /tmp/secrets directory is populated
 # by the puppet configuration
