@@ -36,11 +36,12 @@ RUN \
   librarian-puppet install --verbose && \
   puppet apply --verbose --modulepath=/modules \
     --hiera_config=/modules/petshop/hiera.yaml \
-    --environment=${DOCKER_ENV} -e "class { 'petshop::app': }" &&\
-  rm -rf /modules && \
-  rm -rf /Puppetfile* && \
-  rm -rf /root/.ssh && \
+    --environment=${DOCKER_ENV} -e "class { 'petshop::app': }" && \
+  rm -rf /root/.ssh &&  \
   rm -rf /keys
+# Leave puppet intact for post-launch use inside running container.
+#  rm -rf /modules && \
+#  rm -rf /Puppetfile* && \
 # END PUPPET CONFIG
 
 EXPOSE 8080

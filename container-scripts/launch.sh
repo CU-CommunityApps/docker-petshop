@@ -13,5 +13,14 @@
 chmod 0400 /tmp/secrets/service.conf
 chown root:root /tmp/secrets/service.conf
 
+#### Run Puppet at container launch. ####
+puppet apply --verbose --modulepath=/modules \
+  --hiera_config=/modules/petshop/hiera.yaml \
+  --environment=local -e "class { 'petshop::launch': }"
+
+# Cleanup puppet, like the Dockerfile used to.
+rm -rf /modules
+rm -rf /Puppetfile*
+
 # Launch our main process.
 exec /usr/sbin/nginx -c /etc/nginx/nginx.conf
