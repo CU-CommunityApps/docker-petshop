@@ -149,7 +149,10 @@ aws kms decrypt --ciphertext-blob fileb://service.dev.conf.encrypted --output te
 ```
 docker rm $(docker ps -a -q)
 
-docker build --build-arg DOCKER_ENV=test -t petshop .
+# The Docker build process needs AWS credentials in order for hiera-eyaml-kms to use AWS KMS for decryption.
+docker build --build-arg DOCKER_ENV=local --build-arg AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID --build-arg AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY -t petshop .
+
+docker build --build-arg AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID --build-arg AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY -t petshop .
 
 # provide awscli credentials
 docker run --rm -p 8080:8080 -v ~/.aws:/root/.aws --name petshop petshop

@@ -4,14 +4,22 @@ FROM dtr.cucloud.net/cs/awscli
 ARG DOCKER_ENV=local
 ARG BUILD_NUMBER=1
 ARG APP_NAME=petshop
+ARG AWS_ACCESS_KEY_ID
+ARG AWS_SECRET_ACCESS_KEY
 
 RUN \
   apt-get update && \
-  apt-get install -y nginx zip && \
+  apt-get install -y nano nginx zip && \
   echo "daemon off;" >> /etc/nginx/nginx.conf
 
 # Setup launch script
 COPY container-scripts/launch.sh /root
+
+# Install extra gems, not installed by dtr.cucloud.net/cs/base.
+# Required for running puppet manifests.
+RUN \
+  gem install aws-sdk -v 2.6.49 && \
+  gem install hiera-eyaml-kms -v 0.1
 
 # bust Docker caching
 ADD version /tmp/version
@@ -21,6 +29,7 @@ ADD version /tmp/version
 COPY .ebextensions/*.config /tmp/build/.ebextensions/
 
 # BEGIN PUPPET CONFIG
+
 WORKDIR /
 COPY Puppetfile /
 COPY keys/ /keys
