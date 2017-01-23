@@ -3,23 +3,18 @@
 # This script does final setup of the container
 # and launches the main container process.
 
-#### Decrypt secrets manually, without puppet. ####
-# The /tmp/secrets directory is populated
-# by the puppet configuration
-
-# This will decrypt into /tmp/secrets/service.conf
-#/tmp/secrets/kms-decrypt-files.sh /tmp/secrets/service.conf.encrypted
-
-# Ensure proper owner and permissions for our decrypted file.
-#chmod 0400 /tmp/secrets/service.conf
-#chown root:root /tmp/secrets/service.conf
-
 #### Run Puppet at container launch. ####
-# An alternative way to decrypt secrets at container launch,
-# rather than what's above.
+
+# Primarily, this launch puppet manifest does container configuration that
+# we delayed until launch so that secrets are not plain text inside
+# the Docker image.
+
+# Get the Puppet environment value from where we stashed it.
+PUPPET_ENV=`cat /tmp/puppet_environment`
+echo "Using PUPPET_ENV: $PUPPET_ENV"
 puppet apply --verbose --modulepath=/modules \
   --hiera_config=/modules/petshop/hiera.yaml \
-  --environment=local -e "class { 'petshop::launch': }"
+  --environment=$PUPPET_ENV -e "class { 'petshop::launch': }"
 
 # Cleanup puppet, like the Dockerfile used to.
 #rm -rf /modules

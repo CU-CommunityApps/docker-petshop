@@ -16,7 +16,7 @@ RUN \
 COPY container-scripts/launch.sh /root
 
 # Install extra gems, not installed by dtr.cucloud.net/cs/base.
-# Required for running puppet manifests.
+# Required for running our puppet manifests.
 RUN \
   gem install aws-sdk -v 2.6.49 && \
   gem install hiera-eyaml-kms -v 0.1
@@ -24,7 +24,7 @@ RUN \
 # bust Docker caching
 ADD version /tmp/version
 
-# Start setting up EB deployment packagein /tmp/build.
+# Start setting up EB deployment package in /tmp/build.
 # Puppet will finish populating it, and zip it.
 COPY .ebextensions/*.config /tmp/build/.ebextensions/
 
@@ -47,8 +47,9 @@ RUN \
     --hiera_config=/modules/petshop/hiera.yaml \
     --environment=${DOCKER_ENV} -e "class { 'petshop::app': }" && \
   rm -rf /root/.ssh &&  \
-  rm -rf /keys
-# Leave puppet intact for post-launch use inside running container.
+  rm -rf /keys && \
+  echo $DOCKER_ENV > /tmp/puppet_environment
+# Leave puppet intact for post-launch use at container launch time.
 #  rm -rf /modules && \
 #  rm -rf /Puppetfile* && \
 # END PUPPET CONFIG
