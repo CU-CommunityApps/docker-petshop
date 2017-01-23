@@ -1,0 +1,118 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+
+    "Description": "Create KMS key for an application, and setup admin/use policies for it.",
+
+    "Metadata": {
+        "Sample": {
+            "Description": "This is a sample metadata entry."
+        }
+    },
+
+    "Parameters": {
+
+        "keyName": {
+            "Type": "String",
+            "Default": "petshop-encryption-key",
+            "Description": "Alias or name of the key."
+        },
+        "applicationName": {
+            "Type": "String",
+            "Default": "petshop",
+            "Description": "Application name. E.g., boomi, jadu, jira"
+        },
+        "environmentTag": {
+            "Type": "String",
+            "Default": "test",
+            "Description": "Environment: dev, test, dev/test, prod"
+        }
+    },
+
+    "Mappings": {},
+
+    "Conditions": {},
+
+    "Resources": {
+
+        "kmsKey": {
+            "Type": "AWS::KMS::Key",
+            "Properties": {
+                "Description": "application-specific KMS key for the petshop application.",
+                "Enabled": "true",
+                "EnableKeyRotation": "true",
+                "KeyPolicy": {
+                    "Version": "2012-10-17",
+                    "Id": "key-default-1",
+                    "Statement": [{
+                        "Sid": "Allow administration of the key",
+                        "Effect": "Allow",
+                        "Principal": {
+                            "AWS": "arn:aws:iam::225162606092:role/shib-admin"
+                        },
+                        "Action": [
+                            "kms:Create*",
+                            "kms:Describe*",
+                            "kms:Enable*",
+                            "kms:List*",
+                            "kms:Put*",
+                            "kms:Update*",
+                            "kms:Revoke*",
+                            "kms:Disable*",
+                            "kms:Get*",
+                            "kms:Delete*",
+                            "kms:ScheduleKeyDeletion",
+                            "kms:CancelKeyDeletion"
+                        ],
+                        "Resource": "*"
+                    }, {
+                        "Sid": "Allow use of the key",
+                        "Effect": "Allow",
+                        "Principal": {
+                            "AWS": [
+                                "arn:aws:iam::225162606092:user/pea1",
+                                "arn:aws:iam::225162606092:role/petshop-elasticbeanstalk-ec2-role"
+                            ]
+                        },
+                        "Action": [
+                            "kms:Encrypt",
+                            "kms:Decrypt",
+                            "kms:ReEncrypt*",
+                            "kms:GenerateDataKey*",
+                            "kms:DescribeKey"
+                        ],
+                        "Resource": "*"
+                    }]
+                }
+            }
+        },
+
+        "kmsKeyAlias": {
+            "Type": "AWS::KMS::Alias",
+            "Properties": {
+                "AliasName": {
+                    "Fn::Join": ["", ["alias/", {
+                        "Ref": "keyName"
+                    }]]
+                },
+                "TargetKeyId": {
+                    "Ref": "kmsKey"
+                }
+            }
+        }
+    },
+
+    "Outputs": {
+        "outputKMSKeyId": {
+            "Description": "Id of newly created KMS key",
+            "Value": {
+                "Ref": "kmsKey"
+            }
+        },
+        "OutputKMSKeyName": {
+            "Description": "Alais for the new key",
+            "Value": {
+                "Ref": "kmsKeyAlias"
+            }
+        }
+    }
+  }
