@@ -70,7 +70,8 @@
                         "Principal": {
                             "AWS": [
                                 "arn:aws:iam::225162606092:user/pea1",
-                                "arn:aws:iam::225162606092:role/petshop-elasticbeanstalk-ec2-role"
+                                "arn:aws:iam::225162606092:role/petshop-elasticbeanstalk-ec2-role",
+                                "arn:aws:iam::225162606092:role/Jenkins"
                             ]
                         },
                         "Action": [

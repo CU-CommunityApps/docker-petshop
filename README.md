@@ -1,10 +1,16 @@
 # docker-petshop
 
-An example application that uses standardized configuration and deployment processes from the Cornell Cloudification team.
+An example application that uses standardized configuration and deployment processes from the Cornell Cloud DevOps team.
+
+## To Do
+
+* Docuemntation to create
+  * petshop-elasticbeanstalk-ec2-role
+* Improve the way the KMS key id is stored. It is in multiple places in the puppet-petshop repo.
 
 ## AWS Resources and Configuration
 
-- A custom instance role is used for EC2 instances. This instance role grants the IAM privileges required by the application to run successfully.
+- A custom instance role is used for EC2 instances hosting the container running the application. This instance role grants the IAM privileges required by the application to run successfully.
   - instance role name: petshop-elasticbeanstalk-ec2-role
   - policies attached:
     - DockerCFGReadOnly
@@ -23,35 +29,36 @@ This project shows how Puppet can be used to accomplish configuration management
 
 ## Secrets
 
-This project uses Puppet to configure secrets for images and containers. Secrets deployed by Puppet during the Docker build process are stored in plain text in the corresponding Docker image. Secrets deployed by Puppet at container launch are stored encrypted in the corresponding Docker image. Individual teams will have different comfort levels with each of the approaches.
+This project uses Puppet to decrypt encrypted secrets and configure the plaintext secrets in images and/or containers. Secrets deployed by Puppet during the Docker build process are stored in plain text in the corresponding Docker image. Secrets deployed by Puppet at container launch are stored encrypted in the corresponding Docker image. Individual teams will have different comfort levels with each of the approaches.
 
-Regardless of when secrets are deployed by Puppet, the same two technical mechanisms can be used. In both cases AWS Key Management Service is used for encryption and decryption. These two mechanisms are:
+Regardless of when secrets are deployed by Puppet, the same two technical mechanisms can be used. In both cases [AWS Key Management Service](https://aws.amazon.com/documentation/kms/) is used for encryption and decryption. These two mechanisms are:
 
-**Puppet and hiera-eyaml:** The hiera-eyaml and hiera-eyaml-kms gems are used to extend Puppet functionality to manage secrets directly in Puppet attribute (yaml) files which contain individually encrypted attributes. With proper configuration, Puppet attribute data are transparently decrypted for deployment by Puppet.
+**Puppet and hiera-eyaml:** The [hiera-eyaml](https://github.com/TomPoulton/hiera-eyaml) and [hiera-eyaml-kms](https://github.com/adenot/hiera-eyaml-kms) gems are used to extend Puppet functionality to manage secrets directly in Puppet attribute (yaml) files which contain individually encrypted attributes. With proper configuration, Puppet attribute data are transparently decrypted for deployment by Puppet.
 
-**Puppet and custom KMS scripting:** The approach uses whole file encryption. Puppet is used to deploy files to and image or container and then decrypt them using custom scripts.
+**Puppet and custom KMS scripting:** The approach uses whole file encryption. Puppet is used to deploy files to an image or container and then decrypt them using custom scripts.
 
 ### Secrets using KMS
 
-Both approaches to secrets management uses AWS Key Management Service (KMS), specifically as single application-specific KMS key. See [cloud-formation/kms-key.json](cloud-formation/kms-key.json) for a CloudFormation template to create a KMS specifically for this application to manage secrets using KMS. This template creates a single KMS key with the following characteristics:
+Both approaches to secrets management uses AWS Key Management Service (KMS), specifically a single application-specific KMS key. See [cloud-formation/kms-key.json](cloud-formation/kms-key.json) for a CloudFormation template to create a KMS specifically for this application to manage secrets using KMS. This template creates a single KMS key with the following characteristics:
   - key name (alias): user-defined at CloudFormation stack launch
   - key administrators:
-    - shib-admin role
+    - `shib-admin` role
       - This is the Cornell-standard master administrative role for AWS accounts.
   - key users:
-    - petshop-elasticbeanstalk-ec2-role role
+    - `petshop-elasticbeanstalk-ec2-role` role
       - This is a custom instance role defined for this project.
-    - pea1 IAM user
-      - This gives an IAM user permission to encrypt/decrypt via KMS CLI on a local workstation properly configured with AWS API credentials.
+    - `pea1` IAM user
+      - This gives an IAM user permission to encrypt/decrypt via KMS CLI on a local workstation properly configured with AWS API credentials. Developers need permission to encrypt and decrypt from their local workstation as they work on the configuraiton of the project.
+    - `jenkins` role
+      - This role is associated with the instance profile used by the Jenkins instance building the container.
 
-Before using the `kms-key.json` file to create a new stack, you would want to change it to reference the appropriate ARNs for similar roles and users in your AWS account. See elsewhere in this documentation for more information about the petshop-elasticbeanstalk-ec2-role' role.
+Before using the `kms-key.json` file to create a new stack, you would want to change it to reference the appropriate ARNs for similar roles and users in your AWS account. See elsewhere in this documentation for more information about the `petshop-elasticbeanstalk-ec2-role` role.
 
 ### Puppet and custom KMS scripting
 
-With this approach, entire small files (up to 4KB) are treated as secrets and placed in the docker image or container in encrypted form. At Docker build time or at container launch time, Puppet uses custom scripting to decrypt those files. The 4KB limit comes from the capabilities of KMS. For larger files, you would have to use KMS data keys and key wrapping to encrypt your secrets. See [AWS Key Management Service Concepts](http://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#data-keys).
+With this approach, entire small files (up to 4KB) are treated as secrets and placed in the docker image in encrypted form. At Docker build time or at container launch time, Puppet uses custom scripting to decrypt those files. The 4KB limit comes from the capabilities of KMS. For larger files, you would have to use KMS data keys and key wrapping to encrypt your secrets. See [AWS Key Management Service Concepts](http://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#data-keys).
 
-
-Puppet resources required for this approach:
+Puppet resources (in the `puppet-petshop` project) required for this approach:
 
 - `puppet-petshop/files/kms-secrets`
   - This directory contains example service configuration files and custom scripts.
@@ -62,35 +69,25 @@ Puppet resources required for this approach:
 
 #### How secrets are deployed in this scenario
 
-1. Encrypted files are stored in puppet-petshop git repo at `/files/kms-secrets`. E.g., `service.{environment}.conf.encrypted`.
+1. Encrypted files are stored in `puppet-petshop` git repo at `/files/kms-secrets`. E.g., `service.dev.conf.encrypted`.
 
 1. A Docker build process is initiated by a user on a local workstation or from a Jenkins job. If secrets are to be stored in plain text in Docker images, the Puppet manifest would perform decryption at that time. If secrets are to be configured in the Docker image only in encrypted form, then decryption would be delayed until Puppet runs again at container launch time.
 
 1. Puppet is run during the Docker build and processes the Docker build Puppet manifest.
 
-  1. This Puppet manifest specifies that the environment-specific encrypted files be copied to the Docker image, to `/tmp/secrets/manual-kms` this example.
+  1. This Puppet manifest specifies that the environment-specific encrypted files be copied to the Docker image, to `/tmp/secrets/manual-kms` in this example.
 
   1. This Puppet manifest also specifies that the decryption script `kms-decrypt-files.sh` be copied to the Docker image, to `/tmp/secrets/manual-kms` in this example.
 
-  1. If secrets are to be decrypted at this time, the the `kms-decrypt-files.sh` is `exec`d against the encrypted files, storing the decrypted version of the file in the Docker image.
+  1. If secrets are to be decrypted at this time (i.e. during the Docker build), the  `kms-decrypt-files.sh` is `exec`d against the encrypted files, storing the decrypted version of the file in the Docker image.
 
-1. During the Docker build, a launch script [launch.sh](container-scripts/launch.sh) is copied to the Docker image and that script is defined as the `CMD` to be run when the container launches. This is all specified in the [Dockerfile](Dockerfile). When run at container launch, this script will execute Puppet against a second, launch manifest.
+1. During the Docker build, a launch script [launch.sh](container-scripts/launch.sh) is copied to the Docker image and that script is defined as the `CMD` to be run when the container launches. This is specified in the [Dockerfile](Dockerfile). When run at container launch, the `launch.sh` script will execute Puppet against a second, launch manifest.
 
-1. (Optional) After the Docker build process successfully completes, the resulting Docker image is tagged and stored in `dtr.cucloud.net`. Any secrets already decrypted and deployed to the image are obviously stored as well.
+1. (Optional) After the Docker build process successfully completes, the resulting Docker image is tagged and stored in `dtr.cucloud.net`. Any secrets already decrypted and deployed to the image are obviously stored as well as part of the image layers.
 
-1. When a Docker container based on the image is launched,  [launch.sh](container-scripts/launch.sh) will run. This script runs the second, launch Puppet manifest. If the delayed decryption approach is used, then that second Puppet manifest would specify that `kms-decrypt-files.sh` will be `exec`d to decrypt the already deployed encrypted files. After Puppet is run for the second time, the script then launches the desired primary process for the container.
+1. When a Docker container based on the image is launched,  [launch.sh](container-scripts/launch.sh) will run. This script runs the launch Puppet manifest. If the delayed decryption approach is used, then that second Puppet manifest would specify that `kms-decrypt-files.sh` will be `exec`d to decrypt the already deployed encrypted files. After Puppet is run for the second time, the script then launches the desired primary process for the container.
 
-  There are two ways to give the container the privileges to use the KMS CLI and the application-specific KMS key:
-
-  1. If being launched on a local workstation, a developer would provide her AWS credentials to the container by using Docker volume mapping. Specifically, we map the current user's ~/.aws directory to the container user (root) that will be executing AWS CLI commands. The Docker build and run sequence would look something like:
-
-    ```
-    $ docker build --build-arg DOCKER_ENV=test -t petshop .
-
-    $ docker run --rm -p 8080:8080 -v ~/.aws:/root/.aws petshop
-    ```
-
-  b. If the container is being launched in EC2, then the EC2 instance would need to need be assigned the `petshop-elasticbeanstalk-ec2-role` instance role, which is configured to be allowed to use the application-specific KMS key. This instance role is set in Elastic Beanstalk environment configuration and described elsewhere in this documentation.
+See elsewhere in this document for information about passing AWS credentials to the Docker build process and to a running container. This happens in different ways, depending on the execution context.
 
 #### Creating secrets in the custom KMS scripting scenario
 
@@ -206,39 +203,30 @@ If the Docker build Puppet manifest references attributes that are encrypted, we
   $ docker build --build-arg DOCKER_ENV=local --build-arg AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID --build-arg AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY -t petshop .
   ```
 
-* If building the container in Jenkins, this configuration is required:
+* If building the container in Jenkins, use the [docker-build.sh](build-scripts/docker-build.sh) script. The role that Jenkins is assigned in EC2 must have permissions to use the KMS key.
 
-  ```
-  ?????????
-  ```
+* You can also use the [docker-build.sh](build-scripts/docker-build.sh) script on a local workstartion to build the image. Be aware that it expects AWS CLI credentials to be set as  environment variables (as shown above) in the shell used to launch the build script. Note that beyond building the image, the script also tags it and stores it in dtr.cucloud.net.
 
 #### Running the container
 
+If the container is being launched in EC2, then the EC2 instance would need to need be assigned the `petshop-elasticbeanstalk-ec2-role` instance role, which is configured to be allowed to use the application-specific KMS key. This instance role is set in Elastic Beanstalk environment configuration and described elsewhere in this documentation.
 
-  b. If the container is being launched in EC2, then the EC2 instance would need to need be assigned the `petshop-elasticbeanstalk-ec2-role` instance role, which is configured to be allowed to use the application-specific KMS key. This instance role is set in Elastic Beanstalk environment configuration and described elsewhere in this documentation.
+If the container is being launched on a local workstation, you will need to ensure that the container has access to AWS API credentials for calls to KMS to work. An easy way to accomplish that is to map your own AWS credentials file to the where those credentials should be reside in the container. When AWS API calls are made inside the container by the root user, the AWS API/SDK expect to find credentials in the container at `/root/.aws`. Therefore, launch the container locally with the following docker run volume mapping:
+
+  ```
+  docker run --rm -p 8080:8080 -v ~/.aws:/root/.aws --name petshop petshop
+  ```
 
 
-## Build/Run container locally
+## Misc notes when running the container locally
 
-```
-docker rm $(docker ps -a -q)
+* Clean up your local docker image storage:
 
-# The Docker build process needs AWS credentials in order for hiera-eyaml-kms to use AWS KMS for decryption.
-docker build --build-arg DOCKER_ENV=local --build-arg AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID --build-arg AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY -t petshop .
+  ```
+  docker rm $(docker ps -a -q)
+  ```
+* Connect to the running container, and run a bash shell:
 
-docker build --build-arg AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID --build-arg AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY -t petshop .
-
-# provide awscli credentials
-docker run --rm -p 8080:8080 -v ~/.aws:/root/.aws --name petshop petshop
-
-docker exec -it petshop bash
-```
-
-## hiera-eyaml
-
-- https://github.com/TomPoulton/hiera-eyaml
-
-```
-$ gem install hiera-eyaml
-$ eyaml createkeys
-```
+  ```
+  docker exec -it petshop bash
+  ```

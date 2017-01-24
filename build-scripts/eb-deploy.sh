@@ -23,8 +23,12 @@ VERSION_LABEL=$APP_NAME-$DOCKER_ENV-$BUILD_NUMBER
 ZIP_FILE=$VERSION_LABEL.zip
 S3_BUCKET=elasticbeanstalk-$AWS_REGION-$AWS_ACCOUNT
 
-docker run $DOCKER_IMAGE cat /tmp/$ZIP_FILE > $ZIP_FILE
+# TODO: Check that the chose EB environment name
+# exists ($APP_NAME-$DOCKER_ENV) before proceeding.
 
+# Pull pre-zipped Elastic Beanstalk deployment package from the container.
+docker run $DOCKER_IMAGE cat /tmp/$ZIP_FILE > $ZIP_FILE
+# Store the package in S3.
 aws s3 cp --region $AWS_REGION $ZIP_FILE s3://$S3_BUCKET/$APP_NAME/$ZIP_FILE
 
 echo "Create application version."
