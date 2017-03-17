@@ -17,17 +17,15 @@ if [ -n "$GIT_DEPLOY_KEY_FILE" ]; then
   rm -rf keys || echo "keys not present"
   mkdir keys || echo "keys already exist"
   cp $GIT_DEPLOY_KEY_FILE keys/id_rsa
-  #cp $EYAML_PRIVATE_KEY keys/
-  #cp $EYAML_PUBLIC_KEY keys/
 else
   # Do local workstation-specific actions
 
   # TODO: Improve flexibilty by looking at AWS_DEFULAT_PROFILE and/or ~/.aws/credentials file.
-  if [ -z "$AWS_ACCESS_KEY_ID" ]; then
-    echo "ERROR: For a local build, AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY must be present in environment."
+  if [ -z "$AWS_SESSION_TOKEN" ]; then
+    echo "ERROR: For a local build, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, and AWS_SESSION_TOKEN must be present in environment."
     exit 1
   fi
-  AWS_CREDS="--build-arg AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID --build-arg AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY"
+  AWS_CREDS="--build-arg AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID --build-arg AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY --build-arg AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN"
   echo "Using AWS credentials from environment variables for Docker build. AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID"
 fi
 

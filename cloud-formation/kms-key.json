@@ -10,22 +10,26 @@
     },
 
     "Parameters": {
-
         "keyName": {
             "Type": "String",
             "Default": "petshop-encryption-key",
             "Description": "Alias or name of the key."
         },
-        "applicationName": {
+        "iamUser": {
             "Type": "String",
-            "Default": "petshop",
-            "Description": "Application name. E.g., boomi, jadu, jira"
+            "Default": "pea1",
+            "Description": "Name of an IAM user allowed to use this key."
         },
-        "environmentTag": {
+        "iamRole": {
             "Type": "String",
-            "Default": "test",
-            "Description": "Environment: dev, test, dev/test, prod"
-        }
+            "Default": "petshop-elasticbeanstalk-ec2-role",
+            "Description": "Name of an IAM instance profile allowed to use this key."
+        },
+        "jenkinsRole": {
+            "Type": "String",
+            "Default": "Jenkins",
+            "Description": "Name of an the IAM instance profile used by Jenkins instances."
+        },
     },
 
     "Mappings": {},
@@ -47,7 +51,7 @@
                         "Sid": "Allow administration of the key",
                         "Effect": "Allow",
                         "Principal": {
-                            "AWS": "arn:aws:iam::225162606092:role/shib-admin"
+                            "AWS": { "Fn::Join" : [ "", [ "arn:aws:iam::", { "Ref": "AWS::AccountId" } , ":role/shib-admin" ] ] }
                         },
                         "Action": [
                             "kms:Create*",
@@ -69,9 +73,9 @@
                         "Effect": "Allow",
                         "Principal": {
                             "AWS": [
-                                "arn:aws:iam::225162606092:user/pea1",
-                                "arn:aws:iam::225162606092:role/petshop-elasticbeanstalk-ec2-role",
-                                "arn:aws:iam::225162606092:role/Jenkins"
+                                { "Fn::Join": [ "", [ "arn:aws:iam::", { "Ref": "AWS::AccountId" } , ":user/", { "Ref": "iamUser" } ] ] },
+                                { "Fn::Join": [ "", [ "arn:aws:iam::", { "Ref": "AWS::AccountId" } , ":role/", { "Ref": "iamRole" } ] ] },
+                                { "Fn::Join": [ "", [ "arn:aws:iam::", { "Ref": "AWS::AccountId" } , ":role/", { "Ref": "jenkinsRole" } ] ] }
                             ]
                         },
                         "Action": [
@@ -110,7 +114,7 @@
             }
         },
         "OutputKMSKeyName": {
-            "Description": "Alais for the new key",
+            "Description": "Alias for the new key",
             "Value": {
                 "Ref": "kmsKeyAlias"
             }

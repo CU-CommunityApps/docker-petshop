@@ -1,7 +1,9 @@
-
-# Elastic Beanstalk Files
-keys/*
 version*
 build/*
 tmp/*
 .elasticbeanstalk/*
+
+## In a real situation, we would be sure to exclude the content of the keys directory.
+## In this example, we've checked in the deploy keys so that you can try it out
+## for yourself.
+# keys/*
