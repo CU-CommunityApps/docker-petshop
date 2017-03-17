@@ -1,6 +1,13 @@
 # docker-petshop
 
-This is a trivial example application that uses standardized (but complex) configuration and deployment processes from the Cornell Cloud DevOps team. This repo has a sister repo `puppet-petshop` that contains puppet configuration required for the project.
+This is a trivial example application that uses standardized (but complex) configuration and deployment processes from the Cornell Cloud DevOps team. This repo has a sister repo [puppet-petshop](https://github.com/CU-CommunityApps/puppet-petshop) that contains Puppet configuration required for the project.
+
+## Features
+
+- Application runs in a Docker container
+- Containers are deployed using Elastic Beanstalk
+- Puppet is used for configuration management during Docker build and, optionally, during container launch
+- Secrets are managed by Puppet and encrypted using AWS Key Management Service
 
 ## To Do
 
