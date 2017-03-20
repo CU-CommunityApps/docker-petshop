@@ -15,98 +15,98 @@ Puppet resources required for this approach:
 
 1. Create a KMS key for hiera-eyaml-kms to use.
 
-  See [Secrets Using KMS](PUPPET_SECRETS.md#secrets-using-kms) in this repo.
+    See [Secrets Using KMS](PUPPET_SECRETS.md#secrets-using-kms) in this repo.
 
 1. Install hiera-eyaml and supporting gems on the local workstation:
-  ```
-  $ gem install hiera-eyaml
-  $ gem install aws-sdk
-  $ gem install hiera-eyaml-kms
-  ```
+    ```
+    $ gem install hiera-eyaml
+    $ gem install aws-sdk
+    $ gem install hiera-eyaml-kms
+    ```
 
 1. Setup an the eyaml config file for your workstation user. Copy and paste the lines below into  `~/.eyaml/config.yaml` for your local workstation user. Replace the KMS key id with the one you created above.
-  ```
-  encrypt_method: 'KMS'
-  kms_key_id: '4c044060-5160-4738-9c7b-009e7fc2c104'
-  kms_aws_region: 'us-east-1'
-  ```
+    ```
+    encrypt_method: 'KMS'
+    kms_key_id: '4c044060-5160-4738-9c7b-009e7fc2c104'
+    kms_aws_region: 'us-east-1'
+    ```
 
-  If you wish, you can skip setup of the `~/.eyaml/config.yaml` file and use these eyaml arguments each time you execute it:
+    If you wish, you can skip setup of the `~/.eyaml/config.yaml` file and use these eyaml arguments each time you execute it:
 
-  ```
-  --kms-key-id=<your_KMS_key_id> --kms-aws-region=<your_AWS_region> --encrypt-method=KMS
-  ```
+    ```
+    --kms-key-id=<your_KMS_key_id> --kms-aws-region=<your_AWS_region> --encrypt-method=KMS
+    ```
 
 1. Confirm that hiera-eyaml works and knows about the KMS plugin.
-  ```
-  $ eyaml version
-  [hiera-eyaml-core] Loaded config from /Users/pea1/.eyaml/config.yaml
-  [hiera-eyaml-core] hiera-eyaml (core): 2.1.0
-  [hiera-eyaml-core] hiera-eyaml-kms (gem): 0.1
-  ```
+    ```
+    $ eyaml version
+    [hiera-eyaml-core] Loaded config from /Users/pea1/.eyaml/config.yaml
+    [hiera-eyaml-core] hiera-eyaml (core): 2.1.0
+    [hiera-eyaml-core] hiera-eyaml-kms (gem): 0.1
+    ```
 
 1. Test string encryption.
-  ```
-  $ eyaml encrypt -s "Hello world"
-  [hiera-eyaml-core] Loaded config from /Users/pea1/.eyaml/config.yaml
-  string: ENC[KMS,AQECAHhpScaf3XF9NVK+U6wXpeDoju8w8Ccbz3O4+LbMCXi+UQAAAGkwZwYJKoZIhvcNAQcGoFowWAIBADBTBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDLz6zMdtnIsNxNzw9gIBEIAmhv1St9i1uybeGDyq6bWgQvt8C3uDK5W8bYdwrBdPDgYjJvKIrPs=]
+    ```
+    $ eyaml encrypt -s "Hello world"
+    [hiera-eyaml-core] Loaded config from /Users/pea1/.eyaml/config.yaml
+    string: ENC[KMS,AQECAHhpScaf3XF9NVK+U6wXpeDoju8w8Ccbz3O4+LbMCXi+UQAAAGkwZwYJKoZIhvcNAQcGoFowWAIBADBTBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDLz6zMdtnIsNxNzw9gIBEIAmhv1St9i1uybeGDyq6bWgQvt8C3uDK5W8bYdwrBdPDgYjJvKIrPs=]
 
-  OR
+    OR
 
-  block: >
-      ENC[KMS,AQECAHhpScaf3XF9NVK+U6wXpeDoju8w8Ccbz3O4+LbMCXi+UQAAAGkwZwYJ
-      KoZIhvcNAQcGoFowWAIBADBTBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEE
-      DLz6zMdtnIsNxNzw9gIBEIAmhv1St9i1uybeGDyq6bWgQvt8C3uDK5W8bYdw
-      rBdPDgYjJvKIrPs=]
-  ```
+    block: >
+        ENC[KMS,AQECAHhpScaf3XF9NVK+U6wXpeDoju8w8Ccbz3O4+LbMCXi+UQAAAGkwZwYJ
+        KoZIhvcNAQcGoFowWAIBADBTBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEE
+        DLz6zMdtnIsNxNzw9gIBEIAmhv1St9i1uybeGDyq6bWgQvt8C3uDK5W8bYdw
+        rBdPDgYjJvKIrPs=]
+    ```
 
 1. Test string decryption using the encrypted data from above:
-  ```
-  $ eyaml decrypt -s ENC[KMS,AQECAHhpScaf3XF9NVK+U6wXpeDoju8w8Ccbz3O4+LbMCXi+UQAAAGkwZwYJKoZIhvcNAQcGoFowWAIBADBTBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDLz6zMdtnIsNxNzw9gIBEIAmhv1St9i1uybeGDyq6bWgQvt8C3uDK5W8bYdwrBdPDgYjJvKIrPs=]
-  [hiera-eyaml-core] Loaded config from /Users/pea1/.eyaml/config.yaml
-  Hello world
+    ```
+    $ eyaml decrypt -s ENC[KMS,AQECAHhpScaf3XF9NVK+U6wXpeDoju8w8Ccbz3O4+LbMCXi+UQAAAGkwZwYJKoZIhvcNAQcGoFowWAIBADBTBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDLz6zMdtnIsNxNzw9gIBEIAmhv1St9i1uybeGDyq6bWgQvt8C3uDK5W8bYdwrBdPDgYjJvKIrPs=]
+    [hiera-eyaml-core] Loaded config from /Users/pea1/.eyaml/config.yaml
+    Hello world
   ```
 
 1. Troubleshooting. Use the `--trace` option with eyaml to get more details about what it's doing.
-  ```
-  $ eyaml encrypt --trace -s "Hello world"
-  [hiera-eyaml-core] Loaded config from /Users/pea1/.eyaml/config.yaml
-  [hiera-eyaml-core] Dump of eyaml tool options dict:
-  [hiera-eyaml-core] --------------------------------
-  [hiera-eyaml-core]           (Symbol) encrypt_method     =           (String) KMS               
-  [hiera-eyaml-core]           (Symbol) version            =       (FalseClass) false             
-  [hiera-eyaml-core]           (Symbol) verbose            =       (FalseClass) false             
-  [hiera-eyaml-core]           (Symbol) trace              =        (TrueClass) true              
-  [hiera-eyaml-core]           (Symbol) quiet              =       (FalseClass) false             
-  [hiera-eyaml-core]           (Symbol) help               =       (FalseClass) false             
-  [hiera-eyaml-core]           (Symbol) password           =       (FalseClass) false             
-  [hiera-eyaml-core]           (Symbol) string             =           (String) Hello world       
-  [hiera-eyaml-core]           (Symbol) file               =         (NilClass)                   
-  [hiera-eyaml-core]           (Symbol) stdin              =       (FalseClass) false             
-  [hiera-eyaml-core]           (Symbol) eyaml              =         (NilClass)                   
-  [hiera-eyaml-core]           (Symbol) output             =           (String) examples          
-  [hiera-eyaml-core]           (Symbol) label              =         (NilClass)                   
-  [hiera-eyaml-core]           (Symbol) pkcs7_private_key  =           (String) ./keys/private_key.pkcs7.pem
-  [hiera-eyaml-core]           (Symbol) pkcs7_public_key   =           (String) ./keys/public_key.pkcs7.pem
-  [hiera-eyaml-core]           (Symbol) pkcs7_subject      =           (String) /                 
-  [hiera-eyaml-core]           (Symbol) kms_key_id         =           (String) 4c044060-5160-4738-9c7b-009e7fc2c104
-  [hiera-eyaml-core]           (Symbol) kms_aws_region     =           (String) us-east-1         
-  [hiera-eyaml-core]           (Symbol) trace_given        =        (TrueClass) true              
-  [hiera-eyaml-core]           (Symbol) string_given       =        (TrueClass) true              
-  [hiera-eyaml-core]           (Symbol) executor           =            (Class) Hiera::Backend::Eyaml::Subcommands::Encrypt
-  [hiera-eyaml-core]           (Symbol) source             =           (Symbol) string            
-  [hiera-eyaml-core]           (Symbol) input_data         =           (String) Hello world       
-  [hiera-eyaml-core] --------------------------------
-  string: ENC[KMS,AQECAHhpScaf3XF9NVK+U6wXpeDoju8w8Ccbz3O4+LbMCXi+UQAAAGkwZwYJKoZIhvcNAQcGoFowWAIBADBTBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDGHlknGK3qO7dJcdXAIBEIAm7GxN3b8dxll4mBUMdyC6W9ln69Zp11rgs6GupHty6uB/kgKpAd0=]
+    ```
+    $ eyaml encrypt --trace -s "Hello world"
+    [hiera-eyaml-core] Loaded config from /Users/pea1/.eyaml/config.yaml
+    [hiera-eyaml-core] Dump of eyaml tool options dict:
+    [hiera-eyaml-core] --------------------------------
+    [hiera-eyaml-core]           (Symbol) encrypt_method     =           (String) KMS               
+    [hiera-eyaml-core]           (Symbol) version            =       (FalseClass) false             
+    [hiera-eyaml-core]           (Symbol) verbose            =       (FalseClass) false             
+    [hiera-eyaml-core]           (Symbol) trace              =        (TrueClass) true              
+    [hiera-eyaml-core]           (Symbol) quiet              =       (FalseClass) false             
+    [hiera-eyaml-core]           (Symbol) help               =       (FalseClass) false             
+    [hiera-eyaml-core]           (Symbol) password           =       (FalseClass) false             
+    [hiera-eyaml-core]           (Symbol) string             =           (String) Hello world       
+    [hiera-eyaml-core]           (Symbol) file               =         (NilClass)                   
+    [hiera-eyaml-core]           (Symbol) stdin              =       (FalseClass) false             
+    [hiera-eyaml-core]           (Symbol) eyaml              =         (NilClass)                   
+    [hiera-eyaml-core]           (Symbol) output             =           (String) examples          
+    [hiera-eyaml-core]           (Symbol) label              =         (NilClass)                   
+    [hiera-eyaml-core]           (Symbol) pkcs7_private_key  =           (String) ./keys/private_key.pkcs7.pem
+    [hiera-eyaml-core]           (Symbol) pkcs7_public_key   =           (String) ./keys/public_key.pkcs7.pem
+    [hiera-eyaml-core]           (Symbol) pkcs7_subject      =           (String) /                 
+    [hiera-eyaml-core]           (Symbol) kms_key_id         =           (String) 4c044060-5160-4738-9c7b-009e7fc2c104
+    [hiera-eyaml-core]           (Symbol) kms_aws_region     =           (String) us-east-1         
+    [hiera-eyaml-core]           (Symbol) trace_given        =        (TrueClass) true              
+    [hiera-eyaml-core]           (Symbol) string_given       =        (TrueClass) true              
+    [hiera-eyaml-core]           (Symbol) executor           =            (Class) Hiera::Backend::Eyaml::Subcommands::Encrypt
+    [hiera-eyaml-core]           (Symbol) source             =           (Symbol) string            
+    [hiera-eyaml-core]           (Symbol) input_data         =           (String) Hello world       
+    [hiera-eyaml-core] --------------------------------
+    string: ENC[KMS,AQECAHhpScaf3XF9NVK+U6wXpeDoju8w8Ccbz3O4+LbMCXi+UQAAAGkwZwYJKoZIhvcNAQcGoFowWAIBADBTBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDGHlknGK3qO7dJcdXAIBEIAm7GxN3b8dxll4mBUMdyC6W9ln69Zp11rgs6GupHty6uB/kgKpAd0=]
 
-  OR
+    OR
 
-  block: >
-      ENC[KMS,AQECAHhpScaf3XF9NVK+U6wXpeDoju8w8Ccbz3O4+LbMCXi+UQAAAGkwZwYJ
-      KoZIhvcNAQcGoFowWAIBADBTBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEE
-      DGHlknGK3qO7dJcdXAIBEIAm7GxN3b8dxll4mBUMdyC6W9ln69Zp11rgs6Gu
-      pHty6uB/kgKpAd0=]
-  ```
+    block: >
+        ENC[KMS,AQECAHhpScaf3XF9NVK+U6wXpeDoju8w8Ccbz3O4+LbMCXi+UQAAAGkwZwYJ
+        KoZIhvcNAQcGoFowWAIBADBTBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEE
+        DGHlknGK3qO7dJcdXAIBEIAm7GxN3b8dxll4mBUMdyC6W9ln69Zp11rgs6Gu
+        pHty6uB/kgKpAd0=]
+    ```
 
 ## Configure hiera-eyaml-kms for Puppet
 
