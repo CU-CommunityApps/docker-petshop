@@ -20,8 +20,8 @@ For instructions on using this example, see [Step-by-step Instructions](INSTRUCT
 
 ## Static AWS Resources and Configuration
 
-- *S3 Bucket* A bucket is used to store the Docker credentials file that Elastic Beanstalk requires to authenticate to `dtr.cucloud.net` as a read-only user. See [Docker Credentials Management](https://confluence.cornell.edu/x/oQRfF) for information about that type of credentials file. This bucket should be configured as a private bucket with no bucket policies. The IAM instance profile below, gives access to the bucket for AWS processes that need it.
-- *IAM Role/Instance Profile* A custom instance profile is used for EC2 instances hosting the container running the application. This instance role grants the IAM privileges required by the application to run successfully.
+- **S3 Bucket** - A bucket is used to store the Docker credentials file that Elastic Beanstalk requires to authenticate to `dtr.cucloud.net` as a read-only user. See [Docker Credentials Management](https://confluence.cornell.edu/x/oQRfF) for information about that type of credentials file. This bucket should be configured as a private bucket with no bucket policies. The IAM instance profile below, gives access to the bucket for AWS processes that need it.
+- **IAM Role/Instance Profile** - A custom instance profile is used for EC2 instances hosting the container running the application. This instance role grants the IAM privileges required by the application to run successfully.
   - instance role name: petshop-elasticbeanstalk-ec2-role
   - policies attached:
     - DockerCFGReadOnly

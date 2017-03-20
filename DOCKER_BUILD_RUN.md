@@ -6,6 +6,8 @@ If the Docker build Puppet manifest references attributes that are encrypted or 
 
 ### Building the container on a local workstation
 
+**WARNING!!!** *In order to be safe, you must use temporary AWS credentials retrieved by using dtr.cucloud.net/cs/samlapi as below or some other means. The build steps outlined below (or by using [build-scripts/docker-build.sh](build-scripts/docker-build.sh) result in a Docker image with AWS credentials embedded in metadata. Use only temporary AWS credentials for this process.*
+
 1. Ensure working directory for your shell is `docker-petshop`.
 
 1. Obtain temporary AWS credentials using the process described in [Using Shibboleth for AWS API and CLI access](https://blogs.cornell.edu/cloudification/2016/07/05/using-shibboleth-for-aws-api-and-cli-access/).
@@ -26,7 +28,7 @@ If the Docker build Puppet manifest references attributes that are encrypted or 
   # invalidate Docker caching
   $ date > version
 
-  # build the image 
+  # build the image
   $ docker build --build-arg DOCKER_ENV=local --build-arg AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID --build-arg AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY --build-arg AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN -t petshop .
   ```
 
