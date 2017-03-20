@@ -18,15 +18,13 @@ Puppet resources required for this approach:
   See [Secrets Using KMS](PUPPET_SECRETS.md#secrets-using-kms) in this repo.
 
 1. Install hiera-eyaml and supporting gems on the local workstation:
-
-    ```
-    $ gem install hiera-eyaml
-    $ gem install aws-sdk
-    $ gem install hiera-eyaml-kms
-    ```
+  ```
+  $ gem install hiera-eyaml
+  $ gem install aws-sdk
+  $ gem install hiera-eyaml-kms
+  ```
 
 1. Setup an the eyaml config file for your workstation user. Copy and paste the lines below into  `~/.eyaml/config.yaml` for your local workstation user. Replace the KMS key id with the one you created above.
-
   ```
   encrypt_method: 'KMS'
   kms_key_id: '4c044060-5160-4738-9c7b-009e7fc2c104'
@@ -40,7 +38,6 @@ Puppet resources required for this approach:
   ```
 
 1. Confirm that hiera-eyaml works and knows about the KMS plugin.
-
   ```
   $ eyaml version
   [hiera-eyaml-core] Loaded config from /Users/pea1/.eyaml/config.yaml
@@ -49,7 +46,6 @@ Puppet resources required for this approach:
   ```
 
 1. Test string encryption.
-
   ```
   $ eyaml encrypt -s "Hello world"
   [hiera-eyaml-core] Loaded config from /Users/pea1/.eyaml/config.yaml
@@ -65,7 +61,6 @@ Puppet resources required for this approach:
   ```
 
 1. Test string decryption using the encrypted data from above:
-
   ```
   $ eyaml decrypt -s ENC[KMS,AQECAHhpScaf3XF9NVK+U6wXpeDoju8w8Ccbz3O4+LbMCXi+UQAAAGkwZwYJKoZIhvcNAQcGoFowWAIBADBTBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDLz6zMdtnIsNxNzw9gIBEIAmhv1St9i1uybeGDyq6bWgQvt8C3uDK5W8bYdwrBdPDgYjJvKIrPs=]
   [hiera-eyaml-core] Loaded config from /Users/pea1/.eyaml/config.yaml
@@ -73,7 +68,6 @@ Puppet resources required for this approach:
   ```
 
 1. Troubleshooting. Use the `--trace` option with eyaml to get more details about what it's doing.
-
   ```
   $ eyaml encrypt --trace -s "Hello world"
   [hiera-eyaml-core] Loaded config from /Users/pea1/.eyaml/config.yaml
