@@ -65,7 +65,7 @@ Puppet resources required for this approach:
     $ eyaml decrypt -s ENC[KMS,AQECAHhpScaf3XF9NVK+U6wXpeDoju8w8Ccbz3O4+LbMCXi+UQAAAGkwZwYJKoZIhvcNAQcGoFowWAIBADBTBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDLz6zMdtnIsNxNzw9gIBEIAmhv1St9i1uybeGDyq6bWgQvt8C3uDK5W8bYdwrBdPDgYjJvKIrPs=]
     [hiera-eyaml-core] Loaded config from /Users/pea1/.eyaml/config.yaml
     Hello world
-  ```
+    ```
 
 1. Troubleshooting. Use the `--trace` option with eyaml to get more details about what it's doing.
     ```
