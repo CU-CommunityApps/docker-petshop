@@ -25,6 +25,8 @@ Both approaches to secrets management uses AWS Key Management Service (KMS), spe
 
 Before using the `kms-key.json` file to create the KMS key using CloudFormation, you may want to change it to reference other releveant ARNs for similar roles and users in your AWS account.
 
+If you'd rather create a KMS key by hand, see [Creating Keys](http://docs.aws.amazon.com/kms/latest/developerguide/create-keys.html) in the AWS KMS documentation.
+
 ## Secret management in Puppet using custom KMS scripting
 
 See [Secret management in Puppet using custom KMS scripting](PUPPET_KMS_SCRIPT.md).

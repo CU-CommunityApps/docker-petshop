@@ -15,15 +15,15 @@ Puppet resources required for this approach:
 
 1. Create a KMS key for hiera-eyaml-kms to use.
 
-  See directions elsewhere XXXXXXXXX.
+  See [Secrets Using KMS](PUPPET_SECRETS.md#secrets-using-kms) in this repo.
 
 1. Install hiera-eyaml and supporting gems on the local workstation:
 
-  ```
-  $ gem install hiera-eyaml
-  $ gem install aws-sdk
-  $ gem install hiera-eyaml-kms
-  ```
+    ```
+    $ gem install hiera-eyaml
+    $ gem install aws-sdk
+    $ gem install hiera-eyaml-kms
+    ```
 
 1. Setup an the eyaml config file for your workstation user. Copy and paste the lines below into  `~/.eyaml/config.yaml` for your local workstation user. Replace the KMS key id with the one you created above.
 
